@@ -1,47 +1,47 @@
 import React, { Component } from "react";
 import axios from "axios";
 
-class Registration extends Component {
+class Login extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       email: "",
       password: "",
-      passwordConfirmation: "",
-      registrationErrors: ""
+      loginErrors: ""
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
 
-  //taking the structure from the registrations controller rails api endpoint
+  //taking the structure from the login controller rails api endpoint
   handleSubmit(event) {
-    const { email, password, passwordConfirmation } = this.state;
+    const { email, password } = this.state;
 
     axios
       .post(
-        "http://localhost:3001/registrations",
+        "http://localhost:3001/sessions",
         {
           user: {
             email: email,
-            password: password,
-            password_confirmation: passwordConfirmation
+            password: password
           }
         },
         { withCredentials: true } // stores cookie in client
       )
       .then(response => {
-        if (response.data.status === "created") {
+        console.log(response);
+
+        if (response.data.logged_in) {
           this.props.handleSuccessfulAuth(response.data);
         } else {
           console.log(response);
-          this.state.registrationErrors = response.data.status;
+          this.state.loginErrors = response.data.status;
         }
       })
       .catch(error => {
-        console.log("Registration error: ", error);
+        console.log("Login error: ", error);
       });
     event.preventDefault();
   }
@@ -56,7 +56,7 @@ class Registration extends Component {
   render() {
     return (
       <div>
-        <h1> Registration </h1>
+        <h1> Login </h1>
         <br />
         <form onSubmit={this.handleSubmit}>
           <input
@@ -76,21 +76,12 @@ class Registration extends Component {
             onChange={this.handleChange}
             required
           />
-
-          <input
-            type="password"
-            name="passwordConfirmation"
-            placeholder="Confirm Password"
-            value={this.state.passwordConfirmation}
-            onChange={this.handleChange}
-            required
-          />
           <br />
-          <button type="submit">Register</button>
+          <button type="submit">Login</button>
         </form>
       </div>
     );
   }
 }
 
-export default Registration;
+export default Login;
